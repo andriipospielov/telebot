@@ -14,10 +14,47 @@ $bot->run();
 // setting up start commands
 $bot->command('start', function ($message) use ($bot) {
     $answer = 'Hi there!';
-    $keyboard = new \TelegramBot\Api\Types\ReplyKeyboardMarkup([['/start', '/enemenemeck']], null, true);
+    $keyboard = new \TelegramBot\Api\Types\ReplyKeyboardMarkup([['/start', '/enemenemeck', '/dankmeme']], null, true);
 
     $bot->sendMessage($message->getChat()->getId(), $answer, false, null, null, $keyboard);
 });
+
+
+
+$bot->command('dankmeme', function ($message) use ($bot) {
+    // create curl resource
+    $ch = curl_init();
+// set url
+    curl_setopt($ch, CURLOPT_URL, "http://browsedankmemes.com/");
+//return the transfer as a string
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+// $output contains the output string
+    $output = curl_exec($ch);
+    $dom = new DOMDocument();
+    $dom->loadHTML($output);
+//load all images
+    $elements = $dom->getElementsByTagName('img');
+
+//get all images' srcs
+    $src = array();
+    foreach ($elements as $element){
+        $src[] = $element -> getAttribute('src');
+    }
+//pick a random one
+    $ranImgSrc= $src[array_rand($src)];
+
+//    download and send it to a user
+    $bot->sendPhoto($message->getChat()->getId(), $ranImgSrc );
+
+
+    $keyboard = new \TelegramBot\Api\Types\ReplyKeyboardMarkup([['/start', '/dankmeme']], null, true);
+//    $bot->sendMessage($message->getChat()->getId(), $answer, false, null, null, $keyboard);
+
+
+});
+
+
+
 $bot->command('enemenemeck', function ($message) use ($bot) {
     $answer = 'Do you wanna see some magic?';
     $keyboard = new \TelegramBot\Api\Types\ReplyKeyboardMarkup([['/yes', '/no']], null, true);
